@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# hoc — Hungarian OpenShift CLI (oc magyarul)
+#
+# Magyar parancsokat fordít oc parancsokra. Amit nem ismer fel,
+# változtatás nélkül továbbad az oc-nek — tehát a megszokott
+# angol parancsok is működnek rajta keresztül.
+#
+# A szókincs első felét a Racka-4B (elte-nlp) magyar nyelvmodell
+# javasolta; a végleges lista emberi kurálás. Bééé.
+
+set -euo pipefail
+
+show_help() {
+  cat <<'EOF'
+hoc — magyar OpenShift CLI 🐑
+
+Főnevek (önmagukban = get ...):
+  podok              → oc get pods
+  szolgáltatások     → oc get svc
+  telepítések        → oc get deploy
+  csomópontok        → oc get nodes
+  projektek          → oc get projects
+  események          → oc get events
+  mindent            → oc get all
+
+Igék (első számú egyes szám, ahogy kell):
+  kivagyok           → oc whoami
+  belépek            → oc login
+  kilépek            → oc logout
+  projekt            → oc project
+  napló              → oc logs
+  leírom             → oc describe
+  törlöm             → oc delete
+  alkalmazom         → oc apply
+  futtatom           → oc run
+  benezek            → oc exec
+  méretezem          → oc scale
+  kigurítom          → oc rollout
+  átfurakodom        → oc port-forward
+  csúcs              → oc top
+  magyarázd          → oc explain
+  szerkesztem        → oc edit
+  címkézem           → oc label
+  megjegyzem         → oc annotate
+  ürítem             → oc drain
+  lezárom            → oc cordon
+  feloldom           → oc uncordon
+  bogarászom         → oc debug
+  állapot            → oc status
+  verzió             → oc version
+
+Az erőforrás-szavakat az igék után is érti:
+  hoc törlöm podok   → oc delete pods
+
+Amit nem ismer fel, változatlanul továbbad az oc-nek.
+EOF
+}
+
+cmd=""
+case "${1:-}" in
+  # főnevek → get
+  podok)          cmd="get pods" ;;
+  szolgáltatások) cmd="get svc" ;;
+  telepítések)    cmd="get deploy" ;;
+  csomópontok)    cmd="get nodes" ;;
+  projektek)      cmd="get projects" ;;
+  események)      cmd="get events" ;;
+  mindent)        cmd="get all" ;;
+  # igék
+  kivagyok)       cmd="whoami" ;;
+  belépek)        cmd="login" ;;
+  kilépek)        cmd="logout" ;;
+  projekt)        cmd="project" ;;
+  napló|logok)    cmd="logs" ;;
+  leírom)         cmd="describe" ;;
+  törlöm)         cmd="delete" ;;
+  alkalmazom)     cmd="apply" ;;
+  futtatom)       cmd="run" ;;
+  benezek)        cmd="exec" ;;
+  méretezem)      cmd="scale" ;;
+  kigurítom)      cmd="rollout" ;;
+  átfurakodom)    cmd="port-forward" ;;
+  csúcs)          cmd="top" ;;
+  magyarázd)      cmd="explain" ;;
+  szerkesztem)    cmd="edit" ;;
+  címkézem)       cmd="label" ;;
+  megjegyzem)     cmd="annotate" ;;
+  ürítem)         cmd="drain" ;;
+  lezárom)        cmd="cordon" ;;
+  feloldom)       cmd="uncordon" ;;
+  bogarászom)     cmd="debug" ;;
+  állapot)        cmd="status" ;;
+  verzió)         cmd="version" ;;
+  segítség|--segítség|-h|--help) show_help; exit 0 ;;
+esac
+
+if [ -z "$cmd" ]; then
+  # ismeretlen parancs: eredeti angol továbbadás
+  exec oc "$@"
+fi
+
+shift
+
+# erőforrás-szó fordítása az ige után, ha van (összetett alakokkal is)
+case "${1:-}" in
+  podok)            set -- pods "${@:2}" ;;
+  podok.*)          set -- "pods.${1#podok.}" "${@:2}" ;;
+  podok/*)          set -- "pods/${1#podok/}" "${@:2}" ;;
+  szolgáltatások)   set -- svc "${@:2}" ;;
+  szolgáltatások.*) set -- "svc.${1#szolgáltatások.}" "${@:2}" ;;
+  telepítések)      set -- deploy "${@:2}" ;;
+  telepítések/*)    set -- "deploy/${1#telepítések/}" "${@:2}" ;;
+  csomópontok)      set -- nodes "${@:2}" ;;
+  események)        set -- events "${@:2}" ;;
+esac
+
+# shellcheck disable=SC2086
+exec oc $cmd "$@"
