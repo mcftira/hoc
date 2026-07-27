@@ -38,7 +38,7 @@ Igék (első számú egyes szám, ahogy kell):
   kigurítom          → oc rollout
   átfurakodom        → oc port-forward
   csúcs              → oc top
-  magyarázd          → oc explain
+  magyarázd        → oc explain
   szerkesztem        → oc edit
   címkézem           → oc label
   megjegyzem         → oc annotate
@@ -81,7 +81,7 @@ case "${1:-}" in
   kigurítom)      cmd="rollout" ;;
   átfurakodom)    cmd="port-forward" ;;
   csúcs)          cmd="top" ;;
-  magyarázd)      cmd="explain" ;;
+  magyarázd)     cmd="explain" ;;
   szerkesztem)    cmd="edit" ;;
   címkézem)       cmd="label" ;;
   megjegyzem)     cmd="annotate" ;;

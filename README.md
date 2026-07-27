@@ -34,6 +34,17 @@ hoc ürítem csomópontok1   # oc drain nodes1  (na jó, ez már túlzás)
 
 A teljes lista: `hoc segítség`.
 
+## Kiegészítés (autocomplete)
+
+```bash
+source hoc/hoc-completion.bash
+# vagy véglegesen:
+cp hoc/hoc-completion.bash /etc/bash_completion.d/hoc
+```
+
+Az első szóra a parancsokat, az igék után az erőforrás-szavakat egészíti ki:
+`hoc tör<TAB>` → `törlöm`, `hoc törlöm po<TAB>` → `podok`.
+
 ## A szókincs
 
 Főnevek önmagukban `get`-et jelentenek (`podok` → `get pods`), az igék
